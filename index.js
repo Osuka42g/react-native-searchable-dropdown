@@ -19,7 +19,8 @@ export default class SearchableDropDown extends Component {
     this.state = {
       item: {},
       listItems: [],
-      focus: false
+      focus: false,
+      searchedText: '',
     };
   }
 
@@ -27,21 +28,21 @@ export default class SearchableDropDown extends Component {
     if (this.state.focus) {
       const flatListPorps = { ...this.props.listProps };
       const oldSupport = [
-        { key: 'keyboardShouldPersistTaps', val: 'always' }, 
-        { key: 'nestedScrollEnabled', val : false },
-        { key: 'style', val : { ...this.props.itemsContainerStyle } },
-        { key: 'data', val : this.state.listItems },
-        { key: 'keyExtractor', val : (item, index) => index.toString() },
-        { key: 'renderItem', val : ({ item }) => this.renderItems(item) },
+        { key: 'keyboardShouldPersistTaps', val: 'always' },
+        { key: 'nestedScrollEnabled', val: false },
+        { key: 'style', val: { ...this.props.itemsContainerStyle } },
+        { key: 'data', val: this.state.listItems },
+        { key: 'keyExtractor', val: (item, index) => index.toString() },
+        { key: 'renderItem', val: ({ item }) => this.renderItems(item) },
       ];
       oldSupport.forEach((kv) => {
-        if(!Object.keys(flatListPorps).includes(kv.key)) {
+        if (!Object.keys(flatListPorps).includes(kv.key)) {
           flatListPorps[kv.key] = kv.val;
         }
       });
       return (
         <FlatList
-          { ...flatListPorps }
+          {...flatListPorps}
         />
       );
     }
@@ -63,7 +64,7 @@ export default class SearchableDropDown extends Component {
   searchedItems = searchedText => {
     let setSort = this.props.setSort;
     if (!setSort && typeof setSort !== 'function') {
-        setSort = item => item.name.toLowerCase().indexOf(searchedText.toLowerCase()) > -1;
+      setSort = item => item.name.toLowerCase().indexOf(searchedText.toLowerCase()) > -1;
     }
     var ac = this.props.items.filter((item) => {
       return setSort(item, searchedText);
@@ -72,7 +73,7 @@ export default class SearchableDropDown extends Component {
       id: -1,
       name: searchedText
     };
-    this.setState({ listItems: ac, item: item });
+    this.setState({ listItems: ac, item: item, searchedText, });
     const onTextChange = this.props.onTextChange;
 
     if (onTextChange && typeof onTextChange === 'function') {
@@ -126,7 +127,7 @@ export default class SearchableDropDown extends Component {
             });
           }}
           onBlur={() => {
-            this.props.onBlur && this.props.onBlur()
+            this.props.onBlur && this.props.onBlur(this.state.searchedText)
             this.setState({ focus: false })
           }}
           onChangeText={text => {
